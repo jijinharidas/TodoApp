@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Search from './Search';
 import Home from './Home';
-
+import Logout from './Logout';
 const Navbar: React.FC = () => {
     const [currentPage, changeCurrentPage] = useState<String>('home');
     const activeClass = "bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium";
@@ -21,6 +21,12 @@ const Navbar: React.FC = () => {
                                 <Link to="/search" className={currentPage === 'search'?activeClass:nonActiveClass} onClick={() => changeCurrentPage('search')}>
                                     Search
                                 </Link>
+                                <div className="flex-1"/>
+                                <div className="flex-1"/>
+                                <div className="flex-1"/>
+                                <div className="flex-1">
+                                    <Logout/>
+                                </div>
                             </div>
                         </div>
                     </div>

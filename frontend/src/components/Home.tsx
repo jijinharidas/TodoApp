@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, Pagination } from 'antd';
-
+import {loadState} from '../localStorage';
 const url:string = 'http://localhost:8000'; // String to connect to
 // const headers = {
 //     'Content-Type': 'text/plain',
 // };
 
-axios.defaults.headers.get['Content-type'] = 'text/plain';
-axios.defaults.headers.put['Content-type'] = 'application/json';
-axios.defaults.headers.post['Content-type'] = 'application/json';
 
 const Home: React.FC = () => {
     const [todoList, updateTodoList] = useState<Array<{
@@ -23,20 +20,27 @@ const Home: React.FC = () => {
     const [currentPage, changeCurrentPage] = useState<number>(1); // to change the pages
     const [totalCount, changeTotalCount] = useState<number>(10); // Calculate total number of pages
 
-
     // When task is done
     const doneTask = (id: number, description: string) => {
         var data = {id: id, description: description, completed: true}
-        axios.put(`${url}/todos/${id}/`, data)
+        let token = loadState();
+            let config = {
+              headers: { Authorization: `Token ${token}` },
+            };
+        axios.put(`${url}/todos/${id}/`, data, config)
             .then(() => fetchTodos())
             .catch(err => console.log(err));
     }
 
     // To fetch all the task through the api
     const fetchTodos = () => {
+        let token = loadState();
+        let config = {
+          headers: { Authorization: `Token ${token}` },
+        };
         updateTodoList([]); // set the current todo list to empty to avoid multiple entries
         // axios.get(`${url}/todos?page=${currentPage}`, {headers: headers})
-        axios.get(`${url}/todos?page=${currentPage}`)
+        axios.get(`${url}/todos?page=${currentPage}`,config)
             .then((response) => {
                 console.log(response);
                 var res = response.data.results;
@@ -52,12 +56,17 @@ const Home: React.FC = () => {
             fetchTodos();
     }, [currentPage]); // Fetch todo in loading component and every time page is changed
 
+
     // For adding new todo
     const addNewTodo = () => {
         if (component !== '') {
             var request = {description: ''}
             request['description'] = component
-            axios.post(`${url}/todos/`, request)
+            let token = loadState();
+            let config = {
+              headers: { Authorization: `Token ${token}` },
+            };
+            axios.post(`${url}/todos/`, request, config)
                     .then((response) => {
                         if(response.status === 201){
                             changeComponent(''); // Change the input to empty string
@@ -72,7 +81,11 @@ const Home: React.FC = () => {
     }
 
     const deleteTodo = (id:number) => {
-        axios.delete(`${url}/todos/${id}/`)
+        let token = loadState();
+            let config = {
+              headers: { Authorization: `Token ${token}` },
+            };
+        axios.delete(`${url}/todos/${id}/`, config)
             .then(() => {
                 fetchTodos();
             })

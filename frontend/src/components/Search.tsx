@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from 'antd';
+import {loadState} from '../localStorage';
 
 const url:string = 'http://localhost:8000';
 
@@ -23,13 +24,21 @@ const Search: React.FC = () => {
 
     const doneTask = (id: number, description: string) => {
         var data = {id: id, description: description, completed: true}
-        axios.put(`${url}/todos/${id}/`, data)
+        let token = loadState();
+            let config = {
+              headers: { Authorization: `Token ${token}` },
+            };
+        axios.put(`${url}/todos/${id}/`, data, config)
             .then(() => fetchTodos())
             .catch(err => console.log(err));
     }
 
     const resultFetch = (url:string) => {
-        axios.get(url)
+        let token = loadState();
+            let config = {
+              headers: { Authorization: `Token ${token}` },
+            };
+        axios.get(url, config)
             .then((response) => {
                 var res = response.data.results;
                 res.forEach((x:any) => {
@@ -43,7 +52,11 @@ const Search: React.FC = () => {
 
     const fetchTodos = () => {
         updateTodoList([]);
-        axios.get(`${url}/todos?page=1`)
+        let token = loadState();
+        let config = {
+            headers: { Authorization: `Token ${token}` },
+        }
+        axios.get(`${url}/todos?page=1`, config)
             .then((response) => {
                 var res = response.data.results;
                 var totalPage: number = Math.ceil(response.data.count/7);
@@ -74,7 +87,11 @@ const Search: React.FC = () => {
     }
 
     const deleteTodo = (id:number) => {
-        axios.delete(`${url}/todos/${id}/`)
+        let token = loadState();
+        let config = {
+            headers: { Authorization: `Token ${token}` },
+        }
+        axios.delete(`${url}/todos/${id}/`, config)
             .then(() => {
                 fetchTodos();
             })
